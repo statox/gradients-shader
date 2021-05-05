@@ -7,22 +7,33 @@ Example:
 
 precision highp float;
 
-uniform vec3 u_color;
+uniform vec3 u_c1;
+uniform vec3 u_c2;
+uniform vec2 u_resolution;
 
 // https://gist.github.com/yiwenl/745bfea7f04c456e0101
-vec3 hsb2rgb(vec3 c)
-{
+vec3 hsb2rgb(vec3 c) {
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-void main() {
-    // A blue color
-    // In shaders, the RGB color spectrum goes from 0 - 1 instead of 0 - 255
-    vec3 color = hsb2rgb(u_color);
+/* amt * (stop - start) + start, */
+vec3 lerpColor(vec3 c1, vec3 c2, float amt) {
+    return vec3(
+        amt * (c2.x - c1.x) + c1.x,
+        amt * (c2.y - c1.y) + c1.y,
+        amt * (c2.z - c1.z) + c1.z
+    );
+}
 
-    // gl_FragColor is a built in shader variable, and your .frag file must contain it
-    // We are setting the vec3 color into a new vec4, with an transparency of 1 (no opacity)
-    gl_FragColor = vec4(color, 1.0);
+void main() {
+    // Normalize the position between 0 and 1
+    vec2 st = gl_FragCoord.xy/u_resolution.xy; 
+
+    // Define the color depending on the x position of the pixel (horizontal gradient)
+    vec3 color = lerpColor(u_c1, u_c2, st.x);
+
+    // Set the color of the pixel
+    gl_FragColor = vec4(hsb2rgb(color), 1.0);
 }

@@ -19,9 +19,12 @@ const sketch = (p5) => {
     };
 
     p5.draw = () => {
-        gradientShader.setUniform('u_color', [100, 1, 1]);
+        gradientShader.setUniform('u_c1', [0.25, 0.54, 0.54]);
+        gradientShader.setUniform('u_c2', [0.09, 0.63, 0.42]);
+
+        gradientShader.setUniform('u_resolution', [p5.width, p5.height]);
         p5.shader(gradientShader);
-        p5.rect(0, 0, 800, 800);
+        p5.rect(0, 0, p5.width, p5.height);
     };
 };
 
